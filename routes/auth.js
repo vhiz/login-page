@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const crypto = require('crypto') 
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
+const UserVerification = require('../models/UserVerificatiion')
 
 
 
@@ -29,6 +30,12 @@ router.post('/register', async (req, res) => {
         password: password,
         emailToken:crypto.randomBytes(72).toString('hex')
     })
+
+    const newVerification = new UserVerification({
+            uniqueString: crypto.randomBytes(40).toString('hex'),
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 3600000,
+        })
     try {
         
 
@@ -46,18 +53,24 @@ router.post('/register', async (req, res) => {
             subject: 'please verify your email',
             html: `<h2>${newUser.email} Thank for using this platform</h2>
                 <p>please verify your mail to continue</p>
-                <a href = "http://${req.headers.host}/verify?token=${newUser.emailToken}">Verify</a>
+                <a href = "http://${req.headers.host}/verify?token=${newUser.emailToken}&uniqueString=${newVerification.uniqueString}">Verify</a>
             `
         }
 
 
-        transporter.sendMail(mailOptions, (error, message) => {
+        
+        try {
+            await newVerification.save()
+            transporter.sendMail(mailOptions, (error, message) => {
             if (error) {
                console.log(error)
             } else {
                 console.log(message)
             }
         })
+        } catch (error) {
+            return res.status(400).send(error.message)
+        }
         const savedUser = await newUser.save()
         res.status(200).send('go to email to verify')
     } catch (error) {

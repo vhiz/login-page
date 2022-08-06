@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
     const newVerification = new UserVerification({
             uniqueString: crypto.randomBytes(40).toString('hex'),
             createdAt: Date.now(),
-            expiresAt: Date.now() + 3600000,
+            expiresAt: Date.now() + 3600,
         })
     try {
         
@@ -80,22 +80,17 @@ router.post('/register', async (req, res) => {
 
 
 router.post('/login', async (req, res) => {
-     const user = await User.findOne({ email: req.body.email })
-    if (!user) return res.status(404).send("email doest not exist ☹️")
+    const user = await User.findOne({ email: req.body.email })
+    if (!user) return res.status(400).send('email does not exist')
 
-    if (!user.isVerified) return res.status(401).send("go to email and verify")
-
-    const valid = bcrypt.compare(req.body.password, userExist.password)
-    if(!valid) return res.status(401).send('password not correct ')
-
+    if(!user.isVerified) return res.status(400).send('go to email and verify')
     
+    const valid = await bcrypt.compare(req.body.password, user.password)
+    if (!valid) return res.status(400).send('password  not correct')
     
-    const token = jwt.sign({ id: user._id }, process.env.TOKEN, { expiresIn: '24h' })
-    res.status(200).send("You are logedin🌄", { token})
-
-    
+    const token = jwt.sign({ id: user.id }, process.env.TOKEN, { expiresIn: '24h' })
+    res.status(200).send({token, user})
 })
-
 
 
 module.exports = router

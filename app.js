@@ -4,6 +4,7 @@ const helmet = require('helmet')
 const mongoose = require('mongoose')
 const authRoutes = require('./routes/auth')
 const verifyRoutes = require('./routes/verified')
+const forgotRoutes = require('./routes/forgort')
 require('dotenv/config')
 
 mongoose.connect(process.env.CLONE,()=>{
@@ -23,6 +24,7 @@ app.get('', (req, res) => {
 
 app.use('/auth', authRoutes)
 app.use('/verify', verifyRoutes)
+app.use('/forgot', forgotRoutes)
 
 var Port = process.env.PORT || 3000
 app.listen(Port, () => {

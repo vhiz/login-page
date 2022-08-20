@@ -24,13 +24,25 @@ app.get('', (req, res) => {
     res.send('Simple log in  🌊')
 })
 
+
 app.use('/auth', authRoutes)
 app.use('/verify', verifyRoutes)
 app.use('/forgot', forgotRoutes)
 app.use('/pay', payroute)
 app.use('/product', productroutes)
 
+app.get('*', (req, res)=>{
+    res.send('page not found')
 
+})
+app.post('*', (req, res)=>{
+    res.send('page not found')
+    
+})
+app.delete('*', (req, res)=>{
+    res.send('page not found')
+    
+})
 var Port = process.env.PORT || 3000
 app.listen(Port, () => {
     console.log(`😄 ${Port} 🚀`)

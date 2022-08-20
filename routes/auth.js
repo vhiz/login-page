@@ -19,15 +19,14 @@ router.post('/register', async (req, res) => {
     
 
     //hased password
-     const salt = await bcrypt.genSalt(10)
-        const password = await bcrypt.hash(req.body.password, salt)
-         
+    const salt = await bcrypt.genSalt(10)
+    const hashed = await bcrypt.hash(req.body.password, salt)        
 
   
 
     const newUser =await new User({
         email: req.body.email,
-        password: password,
+        password: hashed,
         emailToken:crypto.randomBytes(72).toString('hex'),
         amount: 5000000
     })

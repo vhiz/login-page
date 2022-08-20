@@ -17,7 +17,7 @@ const verified = (req, res, next) => {
 
 const verifiedAuth = (req, res, next) => {
     verified(req, res, () => {
-        if (req.user.id == req.params.id) {
+        if (req.user.id == req.params.id || req.user.isAdmin) {
             next()
         } else {
             return res.status(401).send('unauthorized')
@@ -25,4 +25,14 @@ const verifiedAuth = (req, res, next) => {
     })
 }
 
-module.exports= {verifiedAuth}
+const verifiedAdmin = (req, res, next) => {
+    verified(req, res, () => {
+        if (req.user.isAdmin) {
+            next()
+        } else {
+            return res.status(401).send('unauthorized')
+        }
+    })
+}
+
+module.exports= {verifiedAuth, verifiedAdmin}

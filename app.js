@@ -5,6 +5,8 @@ const mongoose = require('mongoose')
 const authRoutes = require('./routes/auth')
 const verifyRoutes = require('./routes/verified')
 const forgotRoutes = require('./routes/forgort')
+const payroute= require('./routes/payment')
+const productroutes = require('./routes/product')
 require('dotenv/config')
 
 mongoose.connect(process.env.CLONE,()=>{
@@ -25,6 +27,9 @@ app.get('', (req, res) => {
 app.use('/auth', authRoutes)
 app.use('/verify', verifyRoutes)
 app.use('/forgot', forgotRoutes)
+app.use('/pay', payroute)
+app.use('/product', productroutes)
+
 
 var Port = process.env.PORT || 3000
 app.listen(Port, () => {

@@ -28,7 +28,8 @@ router.post('/register', async (req, res) => {
     const newUser =await new User({
         email: req.body.email,
         password: password,
-        emailToken:crypto.randomBytes(72).toString('hex')
+        emailToken:crypto.randomBytes(72).toString('hex'),
+        amount: 5000000
     })
 
     const newVerification = new UserVerification({
@@ -44,7 +45,8 @@ router.post('/register', async (req, res) => {
             auth: {
                 user: process.env.AUTH_EMAIL,
                 pass: process.env.AUTH_PASS
-            }
+            },
+            from: process.env.AUTH_EMAIL
         })
 
         var mailOptions = {
@@ -72,7 +74,7 @@ router.post('/register', async (req, res) => {
             return res.status(400).send(error.message)
         }
         const savedUser = await newUser.save()
-        res.status(200).send('go to email to verify')
+        res.status(200).send('go to email to verify or check your spam folder')
     } catch (error) {
         res.status(400).send(error.message)        
     }
@@ -88,8 +90,9 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(req.body.password, user.password)
     if (!valid) return res.status(400).send('password  not correct')
     
-    const token = jwt.sign({ id: user.id }, process.env.TOKEN, { expiresIn: '24h' })
-    res.status(200).send({token, user})
+    const{isAdmin, password, emailToken,isVerified,...others}= user._doc
+    const token = jwt.sign({ id: user.id , isAdmin: user.isAdmin}, process.env.TOKEN, { expiresIn: '24h' })
+    res.status(200).send({token, ...others})
 })
 
 
